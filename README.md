@@ -16,6 +16,8 @@ add group
 
 remove group
 
+#users
+
 /users?group=group123
 
 get all users from this group
@@ -32,7 +34,14 @@ add user to group
 
 remove user from group
 
+#messages
 
+/message/writeMessage?fromUserName=user1234&toUserName=user456&messageText=HelloWorld
 
+Send message from one user to another
+
+/message/getConversation?fromUserName=user1234&toUserName=user456&queryLimit=10&skip=0
+
+Get conversation between two users
 
 tbc
