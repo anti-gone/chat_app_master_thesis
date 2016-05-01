@@ -7,49 +7,50 @@ var assert = require("assert");
 var router = express.Router();
 
 /* display all chat groups
- * No params required
- *
+* No params required
+*
  */
-router.get('/', function (req, res, next) {
+router.get('/', function(req, res, next) {
     var db = req.db;
     var collection = db.get('chatgroups');
-    collection.find({}, {}, function (e, docs) {
+    collection.find({},{},function(e,docs) {
             res.json(docs);
         }
-    );
+        );
 });
 
 /*
- * Add group by setting group name and group code
- * Params: name, code
- *
+* Add group by setting group name and group code
+* Params: name, code
+*
  */
-router.get('/addGroup', function (req, res, next) {
+router.get('/addGroup', function(req, res, next) {
     var db = req.db;
     var collection = db.get('chatgroups');
     var name = req.query.name;
-    var code = req.query.code;
+    var code=req.query.code;
 
-    collection.insert({"name": name, "code": code}, function (err, result) {
-        //  assert.equal(err, result);
+    collection.insert({"name": name, "code": code}, function(err, result){
+      //  assert.equal(err, result);
         res.json(result);
 
     });
 });
 
 /* Remove group
- * Params: name
- *
+* Params: name
+*
  */
-router.get('/removeGroup', function (req, res, next) {
+router.get('/removeGroup', function(req,res, next){
     var db = req.db;
     var collection = db.get('chatgroups');
-    var name = req.query.name;
+    var name=req.query.name;
 
-    collection.remove({"name": name}, function (err, result) {
-            res.json(result);
+    collection.remove({"name": name}, function(err, result)
+    {
+      res.json(result);
 
-        }
+    }
     );
 
 
