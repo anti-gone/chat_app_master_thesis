@@ -4,6 +4,95 @@
 var express = require('express');
 var router = express.Router();
 
+
+router.post('/writeMessagePost', function(req, res, next){
+
+    console.log("write message post");
+    var gcm = require('node-gcm');
+
+    var gcm_message= new gcm.Message();
+
+
+    var sender = new gcm.Sender('AIzaSyBPqf-xzJT5GIrFuesiBgJ-6b_h_BGDs6M');
+
+    var db = req.db;
+    var collection_users = db.get('users');
+    var collection_messages = db.get('messages');
+
+
+
+    var reqBody = req.body;
+    console.log(req.body);
+
+    var fromUserName= req.body.fromUserName;
+    var toUserName=req.body.toUserName;
+    var messageText=req.body.messageText;
+
+    var song = req.body.song;
+    var senderLocation=req.body.senderLocation;
+
+    var tokens = collection_users.find({"username": toUserName}, {"tokens":1});
+
+    console.log(tokens);
+
+    //TODO:
+    gcm_message.addData('text', messageText);
+
+
+console.log(req.body);
+    console.log(fromUserName);
+    console.log(toUserName);
+    console.log(messageText);
+
+    var date=new Date();
+
+   getUserData(fromUserName, req.db, function(fromUser)
+    {
+      getUserData(toUserName, req.db, function(toUser)
+        {
+
+
+            var fromUserDisplayName=fromUser.displayName;
+            var toUserDisplayName=toUser.displayName;
+            var toUserTokens=toUser.tokens;
+            collection_messages.insert({
+                "messageText": messageText,
+                "date": date,
+                "fromUserName": fromUserName,
+                "toUserName": toUserName,
+                "fromDisplayName": fromUserDisplayName,
+                "toDisplayName": toUserDisplayName,
+                "song": song,
+                "senderLocation":senderLocation
+            }, function (err, result) {
+
+
+
+                if (err) {
+                    console.log(err);
+                    return next(err);
+
+                }
+
+                if (toUserTokens != undefined)
+                sender.send(gcm_message, { registrationTokens: toUserTokens }, function (err, response) {
+                    if(err) console.error(err);
+                    else    console.log(" success " +response);
+                });
+            console.log("should send result");
+                res.json(result);
+            });
+
+        });
+
+    });
+
+
+
+
+});
+
+/*
 router.get('/writeMessage', function(req, res, next) {
     var db = req.db;
     var collection_users = db.get('users');
@@ -35,10 +124,15 @@ router.get('/writeMessage', function(req, res, next) {
    // var fromUserId = collection_users.find({"username": fromUserName}).toArray()[0]._id;
    // var toUserId = collection_users.find({"username": toUserName}).toArray()[0]._id;
 
-    var fromUserDisplayName = getDisplayName(fromUserName, req.db, function(fromUserDisplayName)
+   getUserData(fromUserName, req.db, function(fromUser)
     {
-        var toUserDisplayName = getDisplayName(toUserName, req.db, function(toUserDisplayName)
+            getUserData(toUserName, req.db, function(toUser)
         {
+
+            var fromUserDisplayName=fromUser.displayName;
+            var toUserDisplayName=toUser.displayName;
+            var toUserTokens=toUser.tokens;
+
 
             collection_messages.insert({
                 "messageText": messageText,
@@ -65,9 +159,9 @@ router.get('/writeMessage', function(req, res, next) {
 
 
 
-});
+});*/
 
-var getDisplayName = function(username, db, callback)
+var getUserData = function(username, db, callback)
 {
 
     var collection_users=db.get('users');
@@ -79,10 +173,11 @@ var getDisplayName = function(username, db, callback)
 
         console.log(res);
 
-        if (res != undefined && res[0] != undefined)
-        callback(res[0].displayName);
+        if (res != undefined && res[0] != undefined) {
+            callback(res[0]);
 
-        else callback(" ");
+        }
+        else callback(null);
 
 
     });

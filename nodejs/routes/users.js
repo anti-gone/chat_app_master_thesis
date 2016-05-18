@@ -10,10 +10,13 @@ router.get('/', function(req, res, next) {
     var users_collection = db.get('users');
 
   chatgroups.find({"name": group},{},function(e,docs) {
-      if (e) {
+      if (e || (!group)) {
           return next(e);
 
       }
+  
+
+
       var group_users = docs[0].user;
 
       users_collection.find({'_id': {$in: group_users}},

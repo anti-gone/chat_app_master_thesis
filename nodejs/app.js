@@ -12,6 +12,8 @@ var routes = require('./routes/index');
 var users = require('./routes/users');
 var groups = require('./routes/groups');
 var message= require('./routes/message');
+var spotify_auth=require('./routes/spotify_auth');
+var pushes=require('./routes/pushes');
 
 var app = express();
 var url = 'mongodb://localhost:27017/chatapp_local';
@@ -25,7 +27,7 @@ app.set('view engine', 'jade');
 //app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
 app.use(logger('dev'));
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
@@ -40,6 +42,8 @@ app.use('/', routes);
 app.use('/users', users);
 app.use('/groups', groups);
 app.use('/message', message);
+app.use('/spotify_auth', spotify_auth);
+app.use('/pushes', pushes);
 
 
 // catch 404 and forward to error handler
