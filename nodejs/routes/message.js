@@ -5,6 +5,38 @@ var express = require('express');
 var router = express.Router();
 
 
+router.get('/updateMessageDistance', function(req, res, next){
+
+    var db = req.db;
+    var collection_messages = db.get('messages');
+    var reqBody = req.body;
+    var message_id=req.messageId;
+    var user_distance=req.usersDistance;
+
+    collection_messages.update({_id: message_id}, {$set: {usersDistance: user_distance }}, function(err, result) {
+
+            if (err) {
+                console.log(err);
+                return next(err);
+
+            }
+
+            else {
+
+                res.json(result);
+            }
+        }
+
+
+    );
+
+
+
+
+});
+
+
+
 router.post('/writeMessagePost', function(req, res, next){
 
     console.log("write message post");
@@ -18,8 +50,6 @@ router.post('/writeMessagePost', function(req, res, next){
     var db = req.db;
     var collection_users = db.get('users');
     var collection_messages = db.get('messages');
-
-
 
     var reqBody = req.body;
     console.log(req.body);
@@ -86,9 +116,6 @@ console.log(req.body);
         });
 
     });
-
-
-
 
 });
 
