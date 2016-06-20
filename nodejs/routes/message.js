@@ -5,15 +5,41 @@ var express = require('express');
 var router = express.Router();
 
 
+router.get('/updateSpotifySongId', function(req, res, next){
+
+    var db = req.db;
+    var collection_messages = db.get('messages');
+    var message_id=req.query.messageId;
+    var spotifySongId = req.query.spotifyID;
+    collection_messages.update({_id: message_id}, {$set: {"song.spotifyID": spotifySongId}}, function(err, result) {
+
+            if (err) {
+                console.log(err);
+                return next(err);
+
+            }
+
+            else {
+
+                res.json(result);
+            }
+        }
+
+
+    );
+
+});
+
 router.get('/updateMessageDistance', function(req, res, next){
 
     var db = req.db;
     var collection_messages = db.get('messages');
-    var reqBody = req.body;
-    var message_id=req.messageId;
-    var user_distance=req.usersDistance;
+    var message_id=req.query.messageId;
+    var user_distance=req.query.usersDistance;
 
-    collection_messages.update({_id: message_id}, {$set: {usersDistance: user_distance }}, function(err, result) {
+    console.log("id: "+message_id+" usersDistance: "+user_distance);
+
+    collection_messages.update({_id: message_id}, {$set: {usersDistance: {distanceValue: user_distance }}}, function(err, result) {
 
             if (err) {
                 console.log(err);
@@ -61,12 +87,17 @@ router.post('/writeMessagePost', function(req, res, next){
     var song = req.body.song;
     var senderLocation=req.body.senderLocation;
 
+    var weatherJSON = req.body.weatherJSON;
+
     var tokens = collection_users.find({"username": toUserName}, {"tokens":1});
 
     console.log(tokens);
 
     //TODO:
-    gcm_message.addData('text', messageText);
+    gcm_message.addNotification({
+        title: "Neue Nachricht",
+            body: messageText
+    });
 
 
 console.log(req.body);
@@ -93,7 +124,8 @@ console.log(req.body);
                 "fromDisplayName": fromUserDisplayName,
                 "toDisplayName": toUserDisplayName,
                 "song": song,
-                "senderLocation":senderLocation
+                "senderLocation":senderLocation,
+                "weatherJSON": weatherJSON
             }, function (err, result) {
 
 
@@ -104,11 +136,20 @@ console.log(req.body);
 
                 }
 
-                if (toUserTokens != undefined)
-                sender.send(gcm_message, { registrationTokens: toUserTokens }, function (err, response) {
-                    if(err) console.error(err);
-                    else    console.log(" success " +response);
-                });
+                console.log(toUserTokens);
+                if (toUserTokens && toUserTokens != undefined) {
+
+                    console.log("send push message");
+                    console.log(gcm_message);
+
+                    sender.send(gcm_message, {registrationTokens: toUserTokens}, function (err, response) {
+                        if (err) console.error(err);
+                        else    console.log(" success " + response);
+                    });
+
+                }
+
+
             console.log("should send result");
                 res.json(result);
             });
