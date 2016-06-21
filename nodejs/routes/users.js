@@ -35,6 +35,37 @@ router.get('/', function(req, res, next) {
   );
 });
 
+router.get('/updateDisplayName', function(req, res, next){
+
+    var db = req.db;
+    var collection = db.get('users');
+    var displayName = req.query.displayName;
+    var username = req.query.username;
+
+    console.log("username "+username);
+    console.log("displayname: "+displayName);
+
+    if (!displayName)
+    {
+        return   next(new Error("You have to specify a display name!"));
+    }
+
+
+    if (!username) {
+        return   next(new Error("You have to specify a username!"));
+    }
+    collection.update({"username": username}, {$set: {"displayName": displayName}}, function(err, result){
+
+        if (err) {
+            return next(err);
+
+        }
+        //  assert.equal(err, result);
+        res.json(result);
+
+    });
+
+});
 
 router.get('/addUser', function(req, res, next) {
   var db = req.db;
