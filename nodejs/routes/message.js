@@ -84,6 +84,7 @@ router.post('/writeMessagePost', function(req, res, next){
     var toUserName=req.body.toUserName;
     var messageText=req.body.messageText;
 
+    var activityValue=req.body.activityValue;
     var song = req.body.song;
     var senderLocation=req.body.senderLocation;
 
@@ -125,7 +126,8 @@ console.log(req.body);
                 "toDisplayName": toUserDisplayName,
                 "song": song,
                 "senderLocation":senderLocation,
-                "weatherJSON": weatherJSON
+                "weatherJSON": weatherJSON,
+                "activityValue": activityValue
             }, function (err, result) {
 
 

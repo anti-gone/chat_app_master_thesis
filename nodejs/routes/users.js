@@ -17,7 +17,16 @@ router.get('/', function(req, res, next) {
   
 
 
+      if (!docs[0]) {
+          res.json({});
+return;
+      }
+
+
       var group_users = docs[0].user;
+
+
+
 
       users_collection.find({'_id': {$in: group_users}},
       function(err, result)
